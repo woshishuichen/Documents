@@ -1,0 +1,38 @@
+#卸载软件包无法定位
+apt-get update
+
+apt-cache search java | awk '{print($1)}' | grep -E -e '^(ia32-)?(sun|oracle)-java' -e '^openjdk-' -e '^icedtea' -e '^(default|gcj)-j(re|dk)' -e '^gcj-(.*)-j(re|dk)' -e 'java-common' | xargs sudo apt-get -y remove
+
+apt-get -y autoremove
+
+#清除配置信息:  
+dpkg -l | grep ^rc | awk '{print($2)}' | xargs sudo apt-get -y purge
+
+#清除java配置及缓存:  
+bash -c 'ls -d /home/*/.java' | xargs sudo rm -rf
+
+#手动清除JVMs:  
+rm -rf /usr/lib/jvm/* 
+
+#kong控制版本信息
+update-alternatives --config java 
+
+-------------------------------------------------------------------
+#自定义安装java1.6
+export JAVA_HOME=/opt/jdk1.6.0_45
+export JAVA_BIN=/opt/jdk1.6.0_45/bin
+export PATH=$PATH:$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+export JAVA_HOME JAVA_BIN PATH CLASSPATH
+
+#添加的环境变量立即有效
+. /etc/profile
+
+#Could not create the Java virtual machine.
+#添加jvm堆
+/etc/environment
+export _JAVA_OPTIONS="-Xms64m -Xmx64m -Xmn32m"
+
+#生效
+source /etc/environment
+java -version
