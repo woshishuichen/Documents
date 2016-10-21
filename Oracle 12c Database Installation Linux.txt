@@ -1,0 +1,248 @@
+#oracle install at 2016.10.20
+#
+http://tutorialforlinux.com/2016/03/31/how-to-install-oracle-12c-database-on-ubuntu-16-04-xenial-64bit-easy-guide/
+http://blog.csdn.net/zhongyifly/article/details/42610399
+
+#super root start
+sudo su
+groupadd -g 502 oinstall
+groupadd -g 503 dba
+groupadd -g 504 oper
+groupadd -g 505 asmadmin
+useradd -u 502 -g oinstall -G dba,asmadmin,oper -s /bin/bash -m oracle
+passwd oracle
+
+
+#libmotif4 libpthread-stubs0 lsb-cxx pdksh
+#是否有先后顺序，ok
+echo 'deb http://cz.archive.ubuntu.com/ubuntu trusty main universe' >> /etc/apt/sources.list.d/extra.list
+apt-get update
+apt-get install libmotif4 libpthread-stubs0 lsb-cxx pdksh #libpthread_nonshared.a
+mv /etc/apt/sources.list.d/extra.list  /etc/apt/sources.list.d/oracle_extra.list
+apt-get update
+
+apt-get install alien autoconf automake autotools-dev binutils doxygen \
+elfutils expat gawk gcc gcc-multilib g++-multilib libstdc++6:i386 ksh less libtiff5 \
+libtiff5-dev lib32z1 libaio1 libaio-dev libc6-dev libc6-dev-i386 libc6-i386 \
+libelf-dev libltdl-dev libodbcinstq4-1 libodbcinstq4-1:i386 \
+libpth-dev libstdc++5 make \
+openssh-server rlwrap rpm sysstat unixodbc unixodbc-dev x11-utils \
+zlibc libglapi-mesa:i386 libglu1-mesa:i386 libqt4-opengl:i386 \
+libpthread-workqueue0 libpthread-workqueue-dev libzthread-2.3-2 libzthread-dev \
+libpthread-stubs0-dev libaio-dev
+
+# back start
+apt-get install alien autoconf automake autotools-dev binutils doxygen \
+elfutils expat gawk gcc gcc-multilib g++-multilib libstdc++6:i386 ksh less libtiff5 \
+libtiff5-dev lib32z1 libaio1 libaio-dev libc6-dev libc6-dev-i386 libc6-i386 \
+libelf-dev libltdl-dev libmotif4 libodbcinstq4-1 libodbcinstq4-1:i386 \
+libpthread-stubs0 libpth-dev libstdc++5 lsb-cxx make \
+pdksh openssh-server rlwrap rpm sysstat unixodbc unixodbc-dev x11-utils \
+zlibc libglapi-mesa:i386 libglu1-mesa:i386 libqt4-opengl:i386 \
+libpthread-workqueue0 libpthread-workqueue-dev libzthread-2.3-2 libzthread-dev \
+libpthread-stubs0-dev libaio-dev
+# back end
+
+#Make Target Directories
+mkdir -p /opt/app/oracle/product/12/dbhome_1
+chown -R oracle:oinstall /opt/app
+chmod -R 775 /opt/app
+
+mkdir /tmp/database
+#unzip database to /tmp/database
+unzip /home/sky/Downloads/linux*****.zip -d /tmp
+
+chown -R oracle:oinstall /tmp/database
+chmod -R 775 /tmp/database
+
+#Make Network Configuration
+#Get hostname:
+#cat /etc/hostname
+#Get IP:
+#ifconfig
+
+#You will Find It Under the lo >> inet Section.
+#Check if Hostname is Already into the Enabled Hosts File.
+#cat /etc/hosts
+#If It’s Not Present then Insert it with:
+#nano /etc/hosts
+#Insert:
+#Example: ‘127.0.0.1 localhost.localdomain’
+#Ctrl+Shift+v to Paste Content into nano
+#Ctrl+x to Save and Exit from nano Editor :)
+#Grant Connection to X Server
+#restart server
+#xhost +myIP
+#Example: # xhost +127.0.0.1
+
+xhost +127.0.0.1
+
+ln -s 源文件 目标文件
+#http://blog.csdn.net/zhongyifly/article/details/42610399
+#Linking Binaries
+ln -s /usr/bin/awk /bin/awk
+ln -s /usr/bin/rpm /bin/rpm
+ln -s /usr/bin/basename /bin/basename
+
+#Linking Libraries
+ln -s /usr/lib/x86_64-linux-gnu /usr/lib64
+ln -s /usr/lib /usr/lib/lib64
+cd /lib64
+
+#Parameters Configuration SetUp
+#Edit /etc/sysctl.conf file.
+nano /etc/sysctl.conf
+
+#Add or amend the following lines
+#### Oracle 12c Kernel Parameters ####
+fs.suid_dumpable = 1
+fs.aio-max-nr = 1048576
+fs.file-max = 6815744
+kernel.shmall = 2097152
+kernel.shmmax = 536870912
+kernel.shmmni = 4096
+# semaphores: semmsl, semmns, semopm, semmni
+kernel.sem = 250 32000 100 128
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default=4194304
+net.core.rmem_max=4194304
+net.core.wmem_default=262144
+net.core.wmem_max=1048586
+#If Exists then Comment out these lines below that Gives an Error
+#net.bridge.bridge-nf-call-ip6tables = 0
+#net.bridge.bridge-nf-call-iptables = 0
+#net.bridge.bridge-nf-call-arptables = 0
+
+#Edit /etc/security/limits.conf file.
+nano /etc/security/limits.conf
+
+#Add the following lines
+#### oracle User Settings 4 Oracle 12c ####
+oracle       soft  nproc  2047
+oracle       hard  nproc  16384
+oracle       soft  nofile 1024
+oracle       hard  nofile 65536
+oracle       soft  stack  10240
+
+#Load the New Kernel Parameters. in /sbin/sysctl
+sysctl -p
+
+#super root end
+
+#user oracle start
+#Add Paths to oracle’s .bashrc
+#Login as Oracle
+su oracle
+
+#Edit .bashrc file
+nano ~/.bashrc
+
+#Insert:
+# Oracle Settings
+TMP=/tmp; 
+export TMP TMPDIR=$TMP; 
+export TMPDIR ORACLE_HOSTNAME=[HOSTNAME]; 
+export ORACLE_HOSTNAME
+ORACLE_UNQNAME=DB12C; 
+export ORACLE_UNQNAME
+ORACLE_BASE=/opt/app/oracle; 
+export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/12/dbhome_1; 
+export ORACLE_HOME
+ORACLE_SID=[DBSID]; 
+export ORACLE_SID
+PATH=/usr/sbin:$PATH; 
+export PATH
+PATH=$ORACLE_HOME/bin:$PATH; 
+export PATH
+LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib:/usr/lib64:lib64; 
+export LD_LIBRARY_PATH
+CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib; 
+export CLASSPATH
+
+# Replace [HOSTNAME] with IP and [DBSID] with SID Name
+#In this Example Respectively:
+HOSTNAME = 127.0.0.1
+DBSID = SID
+
+#Load New .bashrc Settings
+source ~/.bashrc
+
+#Run the Installation Script
+/tmp/database/runInstaller
+
+#if unzip error use super root
+ln -s /usr/bin/unzip /tmp/database/install/unzip
+sudo chmod 777 /usr/bin/unzip
+
+#Then Run the Configuration Scripts for Oracle 12c Database
+sudo su
+/opt/app/oraInventory/orainstRoot.sh
+/opt/app/oracle/product/12/dbhome_1/root.sh
+exit
+
+#run dbca to create database
+xhost local:oracle non-network local connections being added to access control list
+dbca
+
+sys      默认密码:chang_on_install
+system   默认密码:manager
+sysman   默认密码:chang_on_install
+dbsnmp   默认密码:dbsnmp
+
+https://127.0.0.1:5500/em/
+user  :system
+passwd:Oracle!1
+
+
+#创建一个普通用户都把该用户用起来的流程：
+1、创建用户 
+SQL>create user oracle identified by oracle;
+这样就创建了一个用户名密码都为oracle的用户
+但这个时候oracle还是不能登陆成功的，我们需要赋予相应的权限
+ 
+2、赋予create session的权限
+SQL>grant create session to oracle;
+这样oracle用户就能成功登陆进去
+
+但是此时用户还是不能创建表 我们需要赋予用户创建表的权限：
+SQL>grant create table to oracle;
+但是用户此时还不能创建表 因为需要有使用表空间的权限（相当于 用户有了进房间的钥匙 但是没有进大门的钥匙。。。）
+所以也应该赋予相应的权限
+SQL>grant unlimited tablespace to oracle;
+
+这个时候用户就拥有了创建表的权限 由于表是用户oracle的 相应的他就拥有了对创建的表的增删查改的权限了
+3、查看用户拥有什么权限可以通过查询一个系统的视图(数字字典)
+SQL>select * from user_sys_privs;
+这样就可以知道当前用户的权限
+
+4、撤销权限
+SQL> revoke create table from oracle; 
+
+
+#start listener
+lsnrctl
+start
+
+
+#install plsql site 
+sudo apt-get install wine winetricks gdiplus
+http://wiki.winehq.org/GdiPlus
+VBoxManage modifyvm {vmname} --longmode off
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
