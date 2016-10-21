@@ -1,0 +1,20 @@
+sudo apt install git
+
+#config 
+git config --global user.name "Your Name"
+git config --global user.email "youremail@domain.com"
+
+nano ~/.gitconfig
+[user]  
+       name = Your Name
+       email = youremail@domain.com
+
+#ssh key
+ssh-keygen -C 'you email address@gmail.com' -t rsa
+这会在 用户目录 ~/.ssh/ 下建立相应的密钥文件
+
+#test key
+ssh -v git@github.com
+
+
+
