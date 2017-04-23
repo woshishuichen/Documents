@@ -26,8 +26,10 @@ git remote -v
 
 git remote add ssh://git@github.com:woshishuichen/Documents.git
 git pull
-git push -u origin master
 
 git add ‘file’
 git commit -m ‘’
+git push -u origin master
+
+
 
