@@ -1,3 +1,6 @@
+http://www.ruanyifeng.com/blog/2014/06/git_remote.html
+http://jingyan.baidu.com/article/59a015e35aea7df7948865b0.html
+
 sudo apt install git
 
 #config 
@@ -10,11 +13,20 @@ nano ~/.gitconfig
        email = youremail@domain.com
 
 #ssh key
+cd ~/.ssh
 ssh-keygen -C 'you email address@gmail.com' -t rsa
 这会在 用户目录 ~/.ssh/ 下建立相应的密钥文件
 
 #test key
 ssh -v git@github.com
+
+#
+git clone git@github.com:woshishuichen/Documents.git
+git remote -v
+
+git remote add ssh://git@github.com:woshishuichen/Documents.git
+git pull
+git push -u origin master
 
 
 
