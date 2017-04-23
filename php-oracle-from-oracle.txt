@@ -1,0 +1,142 @@
+http://www.oracle.com/technetwork/articles/dsl/technote-php-instant-084410.html
+Enabling the PHP OCI8 Extension on Linux
+On Linux, PHP is generally manually compiled because the bundled version nevers seems to be up to date. However, if you don't wish to recompile PHP, more recent, unsupported RPM packages for Oracle Linux are available from oss.oracle.com, or via Unbreakable Linux Network updates. If a supported PHP environment is desired use Zend Server. These all have the OCI8 extension pre-built.
+
+To build PHP and OCI8 from source code:
+
+Install the Apache HTTP Server and development packages e.g. with yum install httpd httpd-devel.
+
+Download the PHP 5.4 source code and install PHP following Installation on Unix systems in the PHP manual.
+
+At this stage, don't configure the OCI8 extension.
+
+Download the Basic and the SDK Instant Client packages from the OTN Instant Client page. Either the zip file or RPMs can be used.
+
+Install the RPMs as the root user, for example:
+
+rpm -Uvh oracle-instantclient11.2-basic-11.2.0.3.0-1.x86_64.rpm
+rpm -Uvh oracle-instantclient11.2-devel-11.2.0.3.0-1.x86_64.rpm
+The first RPM puts Oracle libraries in /usr/lib/oracle/11.2/client64/lib and the second creates headers in /usr/include/oracle/11.2/client64.
+
+If you are using the ZIP files, the SDK should unzipped to the same directory as the basic package, and a symbolic link manually created:
+
+ln -s libclntsh.so.11.1 libclntsh.so
+The latest OCI8 extension from PECL is always the current version. Although it is generally in sync with the latest PHP 5.4 source code, it can sometimes be more recent. The latest production extension can be automatically downloaded and added to PHP using:
+
+
+pecl install oci8
+
+This gives:
+
+downloading oci8-1.4.7.tgz ...
+Starting to download oci8-1.4.7.tgz (Unknown size)
+.....done: 168,584 bytes
+10 source files, building
+running: phpize
+Configuring for:
+PHP Api Version:         20100412
+Zend Module Api No:      20100525
+Zend Extension Api No:   220100525
+Please provide the path to the ORACLE_HOME directory.
+Use 'instantclient,/path/to/instant/client/lib' if you're compiling
+with Oracle Instant Client [autodetect] :
+
+If you have the Instant Client RPMs, hit Enter and PECL will automatically build and install an oci8.so shared library. If you have the Instant Client zip files, or want a specific version of Instant Client used, then explicitly give the appropriate path after "instantclient,":
+
+instantclient,/usr/lib/oracle/11.2/client64/lib
+Use an explicit, absolute path since PECL does not expand environment variables.
+
+If you don't have the pecl program, you can alternatively download the OCI8 package in a browser and then install it with:
+
+tar -xzf oci8-1.4.7.tgz
+cd oci8-1.4.7
+phpize
+./configure --with-oci8=instantclient,/usr/lib/oracle/11.2/client64/lib
+make install
+Edit php.ini and enable the OCI8 extension with:
+extension=oci8.so
+
+Also confirm extension_dir points to the directory the oci8.so file was installed into.
+
+Add the Instant Client directory to /etc/ld.so.conf, or manually set LD_LIBRARY_PATH to /usr/lib/oracle/11.2/client64/lib. You might also want to set Oracle globalization language environment variables such as TNS_ADMIN and NLS_LANG. If NLS_LANG is not set, a default local environment will be assumed. See the Globalization chapter in The Underground PHP and Oracle Manual for more details.
+
+It is important to set all Oracle environment variables before starting Apache so that the OCI8 process environment is correctly initialized. Setting environment variables in PHP scripts can lead to obvious or non-obvious problems. On Oracle Linux, export environment variables in /etc/sysconfig/httpd. On Debian-based machines set them in /etc/apache2/envvars.
+
+Restart Apache, for example:
+
+service httpd restart
+
+Verifying the PHP OCI8 Extension is Installed
+To check OCI8 configuration, create a simple PHP script phpinfo.php in the Apache document root:
+
+<?php
+phpinfo();
+?>
+
+Load the script into a browser using the appropriate URL, e.g. http://localhost/phpinfo.php. The browser page will contain an "oci8" section saying "OCI8 Support enabled" and listing the OCI8 options that can be configured.
+
+Connecting to an Oracle Database
+To create a connection, Oracle username and password credentials are passed as two parameters of oci_connect(). An Oracle Database name connection identifier must be used for the third parameter because programs linked with Instant Client are always considered "remote" from any database server and need to be told which database instance to connect to. The connection string is likely to be well known for established Oracle databases. With new systems the information is given by the Oracle installation program when the database is set up. The installer should have configured Oracle Network and created a service name such as orcl for you.
+
+There are several ways to pass the connection information to PHP. This example uses Oracle's Easy Connect syntax to connect to the HR schema in the orcl database service running on mymachine. No tnsnames.ora or other Oracle Network file is needed:
+
+$conn = oci_connect('hr', 'hr_password', 'mymachine.mydomain/orcl');
+See Oracle's Using the Easy Connect Naming Method documentation for the Easy Connect syntax.
+
+In new databases the demonstration schemas such as the HR user will need to be unlocked and given a password. This may be done in SQL*Plus by connecting as the SYSTEM user and executing the statement:
+
+ALTER USER username IDENTIFIED BY new_password ACCOUNT UNLOCK;
+
+Using PHP OCI8 and Oracle
+Try out a simple script, testoci.php Modify the connection credentials to suit your database and load it in a browser. This example lists all tables owned by the user HR:
+
+<?php
+
+$conn = oci_connect('hr', 'hr_password', 'mymachine.mydomain/orcl');
+
+$stid = oci_parse($conn, 'select table_name from user_tables');
+oci_execute($stid);
+
+echo "<table>\n";
+while (($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) != false) {
+    echo "<tr>\n";
+    foreach ($row as $item) {
+        echo "  <td>".($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;")."</td>\n";
+    }
+    echo "</tr>\n";
+}
+echo "</table>\n";
+
+?>
+
+Troubleshooting
+Check the Apache error log file for startup errors.
+
+Temporarily set display_error=On in php.ini so script errors are displayed. Switch it back off when finished for security reasons.
+
+Chapter 9 of The Underground PHP and Oracle Manual contains information about common connection errors and discusses alternative ways to set environment variables.
+
+Oracle's SQL*Plus command line tool can be downloaded from the Instant Client page to help resolve environment and connection problems. Check SQL*Plus can connect and then ensure the Environment section (not the Apache Environment section) of phpinfo.php shows the equivalent environment settings.
+
+Windows Specific Help
+
+If the phpinfo.php script does not produce an "oci8" section saying "OCI8 Support enabled", verify that extension=php_oci8_11g.dll is uncommented in php.ini.
+
+If php.ini's extension_dir directive does not contain the directory with php_oci8_11g.dll then Apache startup will give an alert: "PHP Startup: Unable to load dynamic library php_oci8_11g.dll."
+
+If PATH is set incorrectly or the Oracle libraries cannot be found at all, starting Apache will give an alert: "The dynamic link library OCI.dll could not be found in the specified path". The Environment section of the phpinfo() page will show the values of PATH and the Oracle variables actually being used by PHP.
+
+If there are multiple versions of Oracle libraries on the machine then version clashes are likely. For some discussion on setting variables refer to Using PHP OCI8 with 32-bit PHP on Windows 64-bit.
+
+Linux Specific Help
+
+If using Instant Client ZIP files, make sure the two packages are unzipped to the same location. Make sure a symbolic link libclntsh.so points to libclntsh.so.11.1.
+
+Set all required Oracle environment variables in the shell that starts Apache.
+
+Conclusion
+Using Oracle Instant Client and installing PHP OCI8 from PECL provide maximum flexibility, allowing components to be easily installed and upgraded.
+
+Questions and suggestions can be posted on the OTN PHP or Instant Client forums.
+
+The PHP Developer Center contains links to useful background material.
