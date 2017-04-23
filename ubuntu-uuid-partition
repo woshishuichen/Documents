@@ -1,3 +1,4 @@
+http://www.cnblogs.com/findumars/category/935925.html
 Ubuntu中查看硬盘分区UUID的方法（所有Linux目录的解释）
 在Ubuntu中UUID的两种获取方法，至于UUID是什么，你可以大概理解为分区的标识符，像条形码那样。
 
@@ -100,6 +101,9 @@ ls -l /dev/disk/by-id/
     └── tmp
 
 http://blog.csdn.net/andie_guo/article/details/9011653
+
+
+/etc/fstab
 
 
 sudo fdisk -lu
