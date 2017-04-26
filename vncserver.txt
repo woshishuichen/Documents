@@ -1,0 +1,3 @@
+sudo nano /etc/profile.d/startvnc-server.sh
+vnc4server :3
+

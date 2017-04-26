@@ -1,0 +1,60 @@
+sudo apt install apache2
+
+http://localhost
+/etc/apache2/
+|-- apache2.conf
+|       `--  ports.conf
+|-- mods-enabled
+|       |-- *.load
+|       `-- *.conf
+|-- conf-enabled
+|       `-- *.conf
+|-- sites-enabled
+|       `-- *.conf
+
+/etc/init.d/apache2 or apache2ctl restart
+Calling /usr/bin/apache2 directly will not work with the default configuration.
+The default Ubuntu document root is /var/www/html
+
+
+
+sudo apt install mysql-server
+mysql -u root p
+sudo netstat -tap | grep mysql
+netstat -tl | grep mysql
+
+shwo databases;
+use mysql-database;
+show tables;
+
+数据库存放目录： /var/lib/mysql/
+相关配置文件存放目录： /usr/share/mysql
+相关命令存放目录： /usr/bin(mysqladmin mysqldump等命令)
+启动脚步存放目录： /etc/rc.d/init.d/
+sudo nano /etc/mysql/my.cnf
+
+
+3、mysql -h主机地址 -u用户名 －p用户密码 //进入mysql数据库
+4、quit //退出mysql操作
+5、mysqladmin -u用户名 -p旧密码 password 新密码 //更改密码
+6、grant select on 数据库.* to 用户名@登录主机 identified by "密码" //增加新用户
+
+exemple:
+例2、增加一个用户test2密码为abc,让他只可以在localhost上登录，并可以对数据库mydb进行查询、插入、修改、删除的操作 （localhost指本地主机，即MYSQL数据库所在的那台主机），这样用户即使用知道test2的密码，他也无法从internet上直接访问数据 库，只能通过MYSQL主机上的web页来访问了。
+grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";
+如果你不想test2有密码，可以再打一个命令将密码消掉。
+grant select,insert,update,delete on mydb.* to test2@localhost identified by ""; 
+
+
+sudo apt install php7.0
+sudo apt install libapache2-mod-php
+sudo apt-get install phpmyadmin
+sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+sudo gedit /etc/php/7.0/apache2/php.ini
+
+display_errors = On(显示错误日志，出现两次，都要改，不然无效)
+extension=php_mbstring.dll (开启mbstring)
+
+
+
+

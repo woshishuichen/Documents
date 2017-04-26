@@ -1,0 +1,112 @@
+sudo apt-get install sysv-rc-conf
+sudo sysv-rc-conf
+按q退出之后配置即完成
+
+ls /etc/rc*
+我们会发现apache在运行级别2,3,4之下都是开机启动
+service apache2 status 
+
+/*
+1. 预使mysql开机自启动，首先需要注册mysql为ubuntu下的服务。
+直接拷贝MySQL.server文件至/etc/init.d/目录下即可。
+sudo cp $MYSQL_HOME/support-files/mysql.server /etc/init.d/mysql.server
+sudo chmod +x /etc/init.d/mysql.server
+2. 修改my.cnf，指定mysql的启动用户
+定义：命令1=”./mysql.server start –user=user1“，命令2=”./mysql.server start”。（注意，命令1、2的区别在于红色部分）
+在编译安装mysql的过程中，若执行configure命令时指定“–user=user1”参数，则mysql将由用户user1启动，在mysql.server文件中会有“user=user1”这样一行来指定mysql的启动用户，但该行指定的启动用户并未生效。即，需要使用命令1来启动mysql，命令2启动失败。
+为了使命令2生效，同时为了mysql开机自启动，需要修改my.cnf，在[mysqld]区块下添加“user=user1”这样一行。如此，便可使用命令2启动mysql，mysql也可以成功开机自启动。
+3. 设置mysql开机自启动
+sudo update-rc.d -f mysql.server defaults  
+sudo update-rc.d -f mysql.server remove
+启动mysql：service mysql.server start；
+停止mysql：service mysql.server  stop；
+查看mysql运行状态：service mysql.server  status。
+*/
+
+1. 读取 MBR 的信息,启动 Boot Manager
+        Windows 使用 NTLDR 作为 Boot Manager,如果您的系统中安装多个
+        版本的 Windows,您就需要在 NTLDR 中选择您要进入的系统。
+        Linux 通常使用功能强大,配置灵活的 GRUB 作为 Boot Manager。
+2. 加载系统内核,启动 init 进程
+        init 进程是 Linux 的根进程,所有的系统进程都是它的子进程。
+3. init 进程读取 /etc/inittab 文件中的信息,并进入预设的运行级别,
+   按顺序运行该运行级别对应文件夹下的脚本。脚本通常以 start 参数启
+   动,并指向一个系统中的程序。
+        通常情况下, /etc/rcS.d/ 目录下的启动脚本首先被执行,然后是
+        /etc/rcN.d/ 目录。例如您设定的运行级别为 3,那么它对应的启动
+        目录为 /etc/rc3.d/ 。
+4. 根据 /etc/rcS.d/ 文件夹中对应的脚本启动 Xwindow 服务器 xorg
+        Xwindow 为 Linux 下的图形用户界面系统。
+5. 启动登录管理器,等待用户登录
+        Ubuntu 系统默认使用 GDM 作为登录管理器,您在登录管理器界面中
+        输入用户名和密码后,便可以登录系统。(您可以在 /etc/rc3.d/
+        文件夹中找到一个名为 S13gdm 的链接)
+
+acpi-support 高级电源管理支持
+acpid acpi 守护程序.这两个用于电源管理,非常重要
+alsa 声音子系统
+alsa-utils
+anacron cron 的子系统,将系统关闭期间的计划任务,在下一次系统运行时执行。
+apmd acpi 的扩展
+atd 类似于 cron 的任务调度系统。建议关闭
+binfmt-support 核心支持其他二进制的文件格式。建议开启
+bluez-utiles 蓝牙设备支持
+bootlogd 启动日志。开启它
+cron 任务调度系统,建议开启
+cupsys 打印机子系统。
+dbus 消息总线系统(message bus system)。非常重要
+dns-clean 使用拨号连接时,清除 dns 信息。
+evms 企业卷管理系统(Enterprise Volumn Management system)
+fetchmail 邮件用户代理守护进程,用于收取邮件
+gdm gnome 登录和桌面管理器。
+gdomap
+gpm 终端中的鼠标支持。
+halt 别动它。
+hdparm 调整硬盘的脚本,配置文件为 /etc/hdparm.conf。
+hibernate 系统休眠
+hotkey-setup 笔记本功能键支持。支持类型包括: HP, Acer, ASUS, Sony,Dell, 和 IBM。
+hotplug and hotplug-net 即插即用支持,比较复杂,建议不要动它。
+hplip HP 打印机和图形子系统
+ifrename 网络接口重命名脚本。如果您有十块网卡,您应该开启它
+inetd 在文件 /etc/inetd.conf 中,注释掉所有你不需要的服务。如果该文件不包含任何服务,那关闭它是很安全的。
+klogd 重要。
+linux-restricted-modules-common 受限模块支持。
+/lib/linux-restricted-modules/ 文件夹中的模块为受限模块。例如某些驱动程序,如果您没有使用受限模块,就不需要开启它。
+lvm 逻辑卷管理系统支持。
+makedev 创建设备文件,非常重要。
+mdamd 磁盘阵列
+module-init-tools 从/etc/modules 加载扩展模块,建议开启。
+networking 网络支持。按 /etc/network/interfaces 文件预设激活网络,非常重要。
+ntpdate 时间同步服务,建议关闭。
+pcmcia pcmcia 设备支持。
+powernowd 移动 CPU 节能支持
+ppp and ppp-dns 拨号连接
+readahead 预加载库文件。
+reboot 别动它。
+resolvconf 自动配置 DNS
+rmnologin 清除 nologin
+rsync rsync 守护程序
+sendsigs 在重启和关机期间发送信号
+single 激活单用户模式
+ssh ssh 守护程序。建议开启
+stop-bootlogd 在 2,3,4,5 运行级别中停止 bootlogd 服务
+sudo 检查 sudo 状态。重要
+sysklogd 系统日志
+udev & udev-mab 用户空间 dev 文件系统(userspace dev filesystem)。重要
+umountfs 卸载文件系统
+urandom 随机数生成器
+usplash 开机画面支持
+vbesave 显卡 BIOS 配置工具。保存显卡的状态
+xorg-common 设置 X 服务 ICE socket。
+adjtimex 调整核心时钟的工具
+dirmngr 证书列表管理工具,和 gnupg 一起工作。
+hwtools irqs 优化工具
+libpam-devperm 系统崩溃之后,用于修理设备文件许可的守护程序。
+lm-sensors 板载传感器支持
+mdadm-raid 磁盘陈列管理器
+screen-cleanup 清除开机屏幕的脚本
+xinetd 管理其他守护进程的一个 inetd 超级守护程序
+
+
+
+
