@@ -226,33 +226,60 @@ passwd:Oracle!1
 
 
 #创建一个普通用户都把该用户用起来的流程：
-1、创建用户 
+#1、创建用户 
 SQL>create user oracle identified by oracle;
-这样就创建了一个用户名密码都为oracle的用户
-但这个时候oracle还是不能登陆成功的，我们需要赋予相应的权限
+#这样就创建了一个用户名密码都为oracle的用户
+#但这个时候oracle还是不能登陆成功的，我们需要赋予相应的权限
  
-2、赋予create session的权限
+#2、赋予create session的权限
 SQL>grant create session to oracle;
-这样oracle用户就能成功登陆进去
+#这样oracle用户就能成功登陆进去
 
-但是此时用户还是不能创建表 我们需要赋予用户创建表的权限：
+#但是此时用户还是不能创建表 我们需要赋予用户创建表的权限：
 SQL>grant create table to oracle;
-但是用户此时还不能创建表 因为需要有使用表空间的权限（相当于 用户有了进房间的钥匙 但是没有进大门的钥匙。。。）
-所以也应该赋予相应的权限
+#但是用户此时还不能创建表 因为需要有使用表空间的权限（相当于 用户有了进房间的钥匙 但是没有进大门的钥匙。。。）
+#所以也应该赋予相应的权限
 SQL>grant unlimited tablespace to oracle;
 
-这个时候用户就拥有了创建表的权限 由于表是用户oracle的 相应的他就拥有了对创建的表的增删查改的权限了
-3、查看用户拥有什么权限可以通过查询一个系统的视图(数字字典)
+#这个时候用户就拥有了创建表的权限 由于表是用户oracle的 相应的他就拥有了对创建的表的增删查改的权限了
+#3、查看用户拥有什么权限可以通过查询一个系统的视图(数字字典)
 SQL>select * from user_sys_privs;
-这样就可以知道当前用户的权限
+#这样就可以知道当前用户的权限
 
-4、撤销权限
+#4、撤销权限
 SQL> revoke create table from oracle; 
 
+# 启动
+# 可以使用netstat -lntp看一看1521商品是否打开
+$lsnrctl start
+# 停止
+$lsnrctl stop
+# 也可使用
+$dbstart $ORACLE_HOME
+$dbshut $ORACLE_HOME
+# 可用以下命令配置监听，注意必须进入图形界面
+$export LANG=C
+# hostname处尽量填主机名称，不用IP，用IP也要更换端口
+$netmgr
 
-#start listener
-lsnrctl
-start
+
+开启/关闭库
+
+$sqlplus / as sysdba
+# 启动
+SQL>startup;
+# 停止
+SQL>shutdown immediate;
+
+
+#启动/关闭em
+#EM可用web来管理数据库服务器，还算方便，如果需求也可启用。
+# 前提是ORACLE_HOSTNAME要设置正确（命令中也有提示）
+$emctl stop dbconsole
+
+
+#访问地址:
+https://localhost:1158/em
 
 #解锁hr user
 alter user hr account unlock;
