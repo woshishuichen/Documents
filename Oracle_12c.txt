@@ -1,3 +1,21 @@
+rm -rf /opt/9_App/oracle/*
+rm -rf /opt/9_App/oraInventory/*
+rm /usr/local/bin/dbhome
+rm /usr/local/bin/oraenv
+rm /usr/local/bin/coraenv
+rm /etc/oratab
+#8.将/etc/oraInst.loc删除
+rm /etc/oraInst.loc
+#9.将oracle用户删除(若要重新安装,可以不删除)
+#userdel –r oracle
+#10.将用户组删除(若要重新安装,可以不删除)
+#groupdel oinstall
+#groupdel dba
+#11.将启动服务删除
+chkconfig --del dbora
+#到此为止重启后，你的Linux系统下的Oracle数据库已完全删除了！！！
+
+
 #oracle install at 2016.10.20
 #
 http://tutorialforlinux.com/2016/03/31/how-to-install-oracle-12c-database-on-ubuntu-16-04-xenial-64bit-easy-guide/
@@ -27,9 +45,11 @@ libtiff5-dev lib32z1 libaio1 libaio-dev libc6-dev libc6-dev-i386 libc6-i386 \
 libelf-dev libltdl-dev libodbcinstq4-1 libodbcinstq4-1:i386 \
 libpth-dev libstdc++5 make \
 openssh-server rlwrap rpm sysstat unixodbc unixodbc-dev x11-utils \
-zlibc libglapi-mesa:i386 libglu1-mesa:i386 libqt4-opengl:i386 \
-libpthread-workqueue0 libpthread-workqueue-dev libzthread-2.3-2 libzthread-dev \
+zlibc libpthread-workqueue0 libpthread-workqueue-dev libzthread-2.3-2 libzthread-dev \
 libpthread-stubs0-dev libaio-dev
+
+libglapi-mesa:i386 libglu1-mesa:i386 libqt4-opengl:i386 \
+
 
 # back start
 apt-get install alien autoconf automake autotools-dev binutils doxygen \
@@ -41,6 +61,10 @@ pdksh openssh-server rlwrap rpm sysstat unixodbc unixodbc-dev x11-utils \
 zlibc libglapi-mesa:i386 libglu1-mesa:i386 libqt4-opengl:i386 \
 libpthread-workqueue0 libpthread-workqueue-dev libzthread-2.3-2 libzthread-dev \
 libpthread-stubs0-dev libaio-dev
+
+
+
+libstdc++6-4.7-dev numactl mksh libmotif-dev libmotif-common
 # back end
 
 #Make Target Directories
@@ -77,6 +101,8 @@ chmod -R 775 /tmp/database
 
 xhost +127.0.0.1
 
+
+
 ln -s 源文件 目标文件
 #http://blog.csdn.net/zhongyifly/article/details/42610399
 #Linking Binaries
@@ -85,9 +111,13 @@ ln -s /usr/bin/rpm /bin/rpm
 ln -s /usr/bin/basename /bin/basename
 
 #Linking Libraries
-ln -s /usr/lib/x86_64-linux-gnu /usr/lib64
-ln -s /usr/lib /usr/lib/lib64
-cd /lib64
+#ln -s /usr/lib/x86_64-linux-gnu /usr/lib64
+ln -s /usr/lib /usr/lib64
+ln -s /usr/lib/x86_64-linux-gnu/libpthread_nonshared.a /usr/lib
+ln -s /usr/lib/x86_64-linux-gnu/libc_nonshared.a /usr/lib 
+ln -s /opt/9_App/oracle/product/12.1.0/dbhome_1/lib/libclntshcore.so.12.1 /usr/lib
+ln -s /opt/9_App/oracle/product/12.1.0/dbhome_1/lib/libclntsh.so.12.1 /usr/lib
+ln -s /opt/9_App/oracle/product/12.1.0/dbhome_1/lib/libocrutl12.so /usr/lib
 
 #Parameters Configuration SetUp
 #Edit /etc/sysctl.conf file.
@@ -145,11 +175,11 @@ export TMPDIR ORACLE_HOSTNAME=[HOSTNAME];
 export ORACLE_HOSTNAME
 ORACLE_UNQNAME=DB12C; 
 export ORACLE_UNQNAME
-ORACLE_BASE=/opt/app/oracle; 
+ORACLE_BASE=/opt/9_App/oracle; 
 export ORACLE_BASE
-ORACLE_HOME=$ORACLE_BASE/product/12/dbhome_1; 
+ORACLE_HOME=$ORACLE_BASE/product/12.2.0/dbhome_1; 
 export ORACLE_HOME
-ORACLE_SID=[DBSID]; 
+ORACLE_SID=[SID]; 
 export ORACLE_SID
 PATH=/usr/sbin:$PATH; 
 export PATH
@@ -182,7 +212,7 @@ sudo su
 exit
 
 #run dbca to create database
-xhost local:oracle non-network local connections being added to access control list
+xhost local:oracle 
 dbca
 
 sys      默认密码:chang_on_install
@@ -224,6 +254,11 @@ SQL> revoke create table from oracle;
 lsnrctl
 start
 
+#解锁hr user
+alter user hr account unlock;
+commit;
+alter user hr identified by hr;
+select username, account_status from dba_users order by username;
 
 #install plsql site 
 sudo apt-get install wine winetricks gdiplus
