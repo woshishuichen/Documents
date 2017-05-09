@@ -1,0 +1,30 @@
+#apr
+./configure --prefix=/opt/8_Apache/apr
+make && make install
+
+cd ../apr-util
+#apr-util
+./configure --prefix=/opt/8_Apache/apr-util --with-apr=/opt/8_Apache/apr/bin/apr-1-config
+cd ../pcre
+#pcre
+./configure --prefix=/opt/8_Apache/pcre
+cd ../httpd
+#apache
+./configure --prefix=/opt/8_Apache/httpd --with-apr-util=/opt/8_Apache/apr-util/bin/apu-1-config --with-apr=/opt/8_Apache/apr/bin/apr-1-config --with-pcre=/opt/8_Apache/pcre/bin/pcre-config
+
+
+#php
+#if libxml2 error
+#if php.ini to spec locate 
+#--with-config-file-path=
+sudo apt-get install libxml2-dev
+./configure --prefix=/opt/7_Php --with-apxs2=/opt/8_Apache/httpd/bin/apxs --with-config-file-path=/opt/7_Php/etc
+make
+make test
+make install
+
+#config php.ini
+cp php.ini-development /opt/7_Php/etc/php.ini
+#if select php.ini-production to read change-list
+
+
