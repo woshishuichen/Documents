@@ -18,7 +18,7 @@ cd ../httpd
 #if php.ini to spec locate 
 #--with-config-file-path=
 sudo apt-get install libxml2-dev
-./configure --prefix=/opt/7_Php --with-apxs2=/opt/8_Apache/httpd/bin/apxs --with-config-file-path=/opt/7_Php/etc
+./configure --prefix=/opt/7_Php --with-apxs2=/opt/8_Apache/httpd/bin/apxs
 make
 make test
 make install
