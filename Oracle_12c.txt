@@ -218,3 +218,17 @@ rm -f /etc/oraInst.loc etc/oratab
 rm -rf /etc/oracle
 rm -f /etc/inittab.cssd
 rm -f /usr/local/bin/coraenv /usr/local/bin/dbhome /usr/local/bin/oraenv
+
+
+
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=ubuntu)(PORT=1521)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=ubuntu)(PORT=5500))(Security=(my_wallet_directory=/opt/9_App/oracle/admin/orcl/xdb_wallet))(Presentation=HTTP)(Session=RAW))
+Services Summary...
+Service "orcl" has 1 instance(s).
+  Instance "orcl", status READY, has 1 handler(s) for this service...
+Service "orclXDB" has 1 instance(s).
+  Instance "orcl", status READY, has 1 handler(s) for this service...
+The command completed successfully
+

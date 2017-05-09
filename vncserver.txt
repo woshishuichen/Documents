@@ -1,3 +1,19 @@
+sudo apt-get install gnome-panel metacity
+
+mv xstartup xstartup.bak
+#xstartup change
+#!/bin/sh
+unset SESSION_MANAGER
+
+gnome-session &
+gnome-panel &
+gnome-setting-daemon &
+metacity &
+nautilus &
+gnome-terminal &
+#xstartup change end
+
+
 sudo nano /etc/profile.d/startvnc-server.sh
 vnc4server :3
 
