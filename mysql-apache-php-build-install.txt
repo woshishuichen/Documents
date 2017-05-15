@@ -1,0 +1,118 @@
+#mysql build install 
+#apt-get cmake libboost-dev libboost-doc
+groupadd mysql
+useradd -r -g mysql -s /bin/false mysql
+#useradd -g mysql -s /bin/false mysql
+mkdir /opt/6_Mysql
+chmod 750 /opt/6_Mysql
+chown -R mysql:mysql /opt/6_Mysql
+#chgrp -R mysql
+
+mkdir bld
+cd bld
+#use cmake
+#if no boost-1.59
+#cmake .. -DCMAKE_INSTALL_PREFIX=/opt/6_Mysql -DDOWNLOAD_BOOST=ON -DDOWNLOAD_BOOST_TIMEOUT=6000 -#DWITH_BOOST=/opt/0_Downloads/my_boost -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
+cmake .. \
+-DCMAKE_INSTALL_PREFIX=/opt/6_Mysql \
+-DWITH_BOOST=/opt/0_Downloads/my_boost/boost_1_59_0 \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+--enable-thread-safe-client
+
+#user if no DCMAKE_INSTALL_PREFIX can do make maybe
+#make install DESTDIR="/opt/6_Mysql"
+
+cd /usr/local/mysql
+chown -R mysql .
+chgrp -R mysql .
+#bin/mysql_install_db --user=mysql    # Before MySQL 5.7.6
+bin/mysqld --initialize --user=mysql  # MySQL 5.7.6 and up
+bin/mysql_ssl_rsa_setup               # MySQL 5.7.6 and up
+chown -R root .
+chown -R mysql data
+#start mysql
+bin/mysqld_safe --user=mysql &
+# Next command is optional
+# auto start
+#cp support-files/mysql.server /etc/init.d/mysql.server
+
+mysqld_safe --user=mysql &
+mysqladmin version
+mysqladmin -u root -p version
+mysqladmin -u root shutdown
+
+
+netstat -tunpl | grep 3306
+
+
+#cann't to be started. if use it can be do cp mysql.server to init.d. 
+#mysqld start
+#mysqladmin -uroot password 'root'
+#mysql -uroot -p
+
+#########################
+#apache build install
+#apr
+./configure --prefix=/opt/8_Apache/apr
+make && make install
+cd ../apr-util-1.5.4
+#apr-util-1.5.4
+./configure --prefix=/opt/8_Apache/apr-util \
+--with-apr=/opt/8_Apache/apr/bin/apr-1-config
+make && make install
+cd ../pcre-8.40
+#pcre
+./configure --prefix=/opt/8_Apache/pcre
+make && make install
+cd ../httpd-2.4.25
+#apache
+./configure --prefix=/opt/8_Apache/httpd \
+--with-apr-util=/opt/8_Apache/apr-util/bin/apu-1-config \
+--with-apr=/opt/8_Apache/apr/bin/apr-1-config \
+--with-pcre=/opt/8_Apache/pcre/bin/pcre-config
+make && make install
+
+############################
+#php build install
+#if libxml2 error
+#if --with-zlib-dir=   ln -s libmysqlclient.so libmysqlclient_r.so
+#if php.ini to spec locate 
+# oci8
+# instantclient-basic-linux.x64-12.1.0.2.0
+# instantclient-sdk-linux.x64-12.1.0.2.0.zip
+ln -s libnnz12.so libnnz.so
+ln -s libclntsh.so.12.1 libclntsh.so
+ln –s libocci.so.12.1 libocci.so
+#--with-config-file-path=
+# if lib non sudo apt-get install libxml2-dev
+./configure --prefix=/opt/7_Php \
+--with-apxs2=/opt/8_Apache/httpd/bin/apxs \
+--with-pdo-mysql=/opt/6_Mysql \
+--with-oci8=instantclient,/opt/8_Apache/instantclient_12_1_0_2 
+##--with-config-file-path=/opt/6_Mysql/support-files/php.ini \ 
+#--with-zlib-dir='paht => libmysqlclient.so'?
+make
+make test
+make install
+
+#config php.ini  --default
+cp php.ini-development /opt/7_Php/etc/php.ini
+ln -s to apache
+#if select php.ini-production to read change-list
+
+######################
+#httpd.conf
+#LoadModule php7_module        modules/libphp7.so
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+<FilesMatch \.php$>
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+
+
+
+
+
