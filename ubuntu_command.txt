@@ -20,3 +20,10 @@ ln -s source dist        # 建立软连接
 ln source dist           # 建立硬连接
 删除符号链接，有创建就有删除
 rm -rf   symbolic_name   #注意不是rm -rf   symbolic_name/ 
+
+#show used memory
+sudo df -h /dev/shm
+
+#change memory
+mount -t tmpfs shmfs -o size=7g /dev/shm
+shmfs /dev/shm tmpfs size=7g 0

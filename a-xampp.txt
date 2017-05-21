@@ -1,0 +1,92 @@
+sudo chmod 777 xampp-linux-x64-5.6.30-1-installer.run 
+sudo ./xampp-linux-x64-5.6.30-1-installer.run --installer-language zh_CN
+sudo apt-get install autoconf
+
+sudo lamp serurity
+
+#or 
+#/home/ubuntu/1_opt/lampp/etc/extra/httpd-xampp.conf
+#require all granted
+
+cd xdebug-2.4.0/
+/opt/lampp/bin/phpize
+
+./configure --prefix=/opt/lampp --enable-xdebug --with-php-config=/opt/lampp/bin/php-config
+sudo make
+make test
+sudo make install
+
+sudo gedit /opt/lampp/etc/php.ini
+#add to file end
+[Xdebug]
+zend_extension=/opt/lampp/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so
+xdebug.profiler_enable=on
+xdebug.trace_output_dir="../xdebug"
+xdebug.profile_output_dir="../xdebug"
+xdebug.remote_enable = 1//这两行远程是配合vscode的
+xdebug.remote_autostart = 1
+
+sudo mkdir /opt/lampp/etc/xdebug
+
+
+cd /opt/lampp
+sudo ./manager-linux-x64.run
+#直接命令行启动
+lampp start
+lampp stop
+lampp restart
+#只启动和停止Apache：
+/opt/lampp/lampp startapache(stopapache)
+#只启动和停止MySQL：
+/opt/lampp/lampp startmysql(stopmysql)
+#只启动和停止ProFTPD服务器：
+/opt/lampp/lampp startftp(stopftp)
+#启动和停止Apache的SSL支持：
+/opt/lampp/lampp startssl(stopssl)
+#取消自启动：
+ln –s /opt/lampp/lampp K01lampp
+#卸载XAMPP:
+rm –rf /opt/lampp
+
+
+
+sudo nautilus
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=Terminal
+Categories=Application;
+Exec=gksu /opt/lampp/manager-linux-x64.run
+Name=lampp
+Comment=lammp
+Icon=/opt/lampp/htdocs/favicon.ico
+
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=Terminal
+Categories=GNOME;GTK;
+Exec=xterm -e 'sudo /opt/lampp/lampp start'
+Name=Xampp
+Comment=
+Icon=/opt/lampp/htdocs/favicon.ico
+
+X-Ayatana-Desktop-Shortcuts=Start;Restart;Stop;
+
+[Start Shortcut Group]
+Name=Start
+Exec=xterm -e 'sudo /opt/lampp/lampp start'
+OnlyShowIn=Unity
+
+[Restart Shortcut Group]
+Name=Restart
+Exec=xterm -e 'sudo /opt/lampp/lampp restart'
+OnlyShowIn=Unity
+
+[Stop Shortcut Group]
+Name=Stop
+Exec=xterm -e 'sudo /opt/lampp/lampp stop'
+OnlyShowIn=Unity
+
+
