@@ -122,6 +122,10 @@ sudo su
 /opt/9_App/oracle/product/12/dbhome_1/root.sh
 exit
 
+## /etc/fstab
+#for oracle target_max_memory
+shmfs /dev/shm tmpfs size=4g 0
+
 #run dbca to create database
 xhost +
 #create database
